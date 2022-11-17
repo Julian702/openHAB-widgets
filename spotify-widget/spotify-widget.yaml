@@ -1,4 +1,4 @@
-uid: spotify_widget_0.01
+uid: spotify_widget_0.02
 tags:
   - music
   - speaker
@@ -8,6 +8,21 @@ props:
     - description: Title for the Widget
       label: Static Title
       name: title
+      required: false
+      type: TEXT
+    - description: Color for the Widget (e.g. green)
+      label: Color
+      name: color
+      required: false
+      type: TEXT
+    - description: Font Size for the Widget (default 12px)
+      label: Font Size
+      name: fontSize
+      required: false
+      type: TEXT
+    - description: Icon Size for the Widget (default 25)
+      label: Icon Size
+      name: iconSize
       required: false
       type: TEXT
     - context: item
@@ -86,228 +101,174 @@ props:
       required: false
       type: TEXT
   parameterGroups: []
-timestamp: Dec 31, 2021, 6:18:42 PM
+timestamp: Nov 18, 2022, 12:36:14 PM
 component: f7-card
 config:
-  style:
-    min-width: 270px
   title: =props.title
 slots:
   default:
-    - component: f7-row
-      config:
-        class: = (items[props.activeDeviceName].state !== "NULL")?"display-none":"display-flex justify-content-center"
+    - component: f7-card-content
       slots:
         default:
-          - component: Label
+          - component: f7-row
             config:
-              text: This Spotify Bridge is Unavailable
-    - component: f7-row
-      config:
-        class: = (items[props.activeDeviceName].state === "NULL")?"display-none":"display-flex justify-content-center"
-        style:
-          position: relative
-          top: 5px
-      slots:
-        default:
-          - component: Label
+              class: = (items[props.activeDeviceName].state !== "NULL") ? "display-none":"justify-content-center"
+            slots:
+              default:
+                - component: Label
+                  config:
+                    text: This Spotify Bridge is Unavailable
+          - component: f7-row
             config:
+              class: = (items[props.activeDeviceName].state === "NULL") ? "display-none":"justify-content-center"
+            slots:
+              default:
+                - component: Label
+                  config:
+                    text: = items[props.artistName].state + " - " + items[props.trackName].state + " (" + items[props.albumName].state + ")" || "-"
+                    style:
+                      font-weight: bold
+                      overflow: hidden
+                      white-space: nowrap
+          - component: f7-row
+            config:
+              class: '=(items[props.albumImage].state === "NULL") ? "display-none" : "margin-vertical justify-content-center"'
+            slots:
+              default:
+                - component: oh-image
+                  config:
+                    item: =props.albumImage
+                    style:
+                      width: 80%
+          - component: f7-row
+            config:
+              class:
+                - align-items-center
+                - justify-content-center
+                - margin-vertical
               style:
-                font-size: normal
-                font-style: italic
-                font-weight: bold
-                overflow: hidden
-                white-space: nowrap
-              text: = items[props.artistName].state + " - " + items[props.trackName].state + " (" + items[props.albumName].state + ")" || "-"
-    - component: f7-row
-      config:
-        class: '=(items[props.albumImage].state === "NULL")?"display-none" : "- margin-vertical - justify-content-center"'
-      slots:
-        default:
-          - component: oh-image
-            config:
-              item: =props.albumImage
-              style:
-                width: 70%
-    - component: f7-row
-      config:
-        class:
-          - justify-content-center
-        style:
-          height: 20px
-          position: relative
-          top: -10px
-      slots:
-        default:
-          - component: f7-card
-            config:
-              class: margin display-flex align-items-center
+                fontSize: '=props.fontSize ? props.fontSize : "12px"'
               noShadow: true
-              style:
-                fontSize: 12px
-                width: calc(100% - 80px)
             slots:
               default:
                 - component: Label
                   config:
                     text: = items[props.trackProgress].state
                     style:
-                      left: -1%
-                      top: -1px
-                      position: relative
+                      position: absolute
+                      left: 5%
                 - component: f7-progressbar
                   config:
-                    color: green
                     item: props.trackProgress
                     progress: = 100 * items[props.trackProgressMs].state / items[props.trackDurationMs].state
+                    color: =props.color
                     style:
-                      height: +2px
+                      height: 2px
+                      width: 80%
                 - component: Label
                   config:
                     text: = items[props.trackDuration].state
                     style:
-                      left: +1%
-                      top: -1px
-                      position: relative
-    - component: f7-row
-      config:
-        class:
-          - justify-content-space-around
-          - display-flex
-          - align-items-center
-          - align-content-stretch
-          - margin-top
-      slots:
-        default:
-          - component: f7-icon
-            config:
-              color: '=(items[props.activeDeviceShuffle].state === "ON") ? "green" : ""'
-              f7: '=(props.activeDeviceShuffle) ? "shuffle" : ""'
-              size: 20
-              style:
-                left: +8%
-                position: relative
-            slots:
-              default:
-                - component: oh-button
-                  config:
-                    action: command
-                    actionCommand: '=(items[props.activeDeviceShuffle].state !== "ON") ? "ON" : "OFF"'
-                    actionItem: = props.activeDeviceShuffle
-                    style:
-                      height: 100%
                       position: absolute
-                      top: 0px
-                      width: 100%
-          - component: oh-player-item
+                      right: 5%
+          - component: f7-row
             config:
               class:
-                - display-flex
-                - margin-
-                - align-content-stretch
+                - justify-content-space-evenly
                 - align-items-center
-                - justify-content-space-around
-              item: =props.trackPlayer
-              style:
-                width: 150px
-          - component: f7-icon
-            config:
-              color: '=(items[props.repeatMode].state === "context") ? "green" : (items[props.repeatMode].state === "track") ? "green" : ""'
-              f7: '=(props.repeatMode) ? (items[props.repeatMode].state === "context") ? "repeat" : (items[props.repeatMode].state === "track") ? "repeat_1" : "repeat" : ""'
-              size: 20
-              style:
-                left: -8%
-                position: relative
-            slots:
-              default:
-                - component: oh-button
-                  config:
-                    action: command
-                    actionCommand: '=(items[props.repeatMode].state === "context") ? "track" : (items[props.repeatMode].state === "track") ? "off": "context"'
-                    actionItem: = props.repeatMode
-    - component: f7-row
-      config:
-        class:
-          - justify-content-space-around
-          - display-flex
-          - align-items-center
-          - align-content-stretch
-          - margin-top
-        style:
-          position: relative
-          top: 0px
-      slots:
-        default:
-          - component: f7-card
-            config:
-              class: margin display-flex align-items-center
-              noShadow: true
-              style:
-                fontSize: 20px
-                height: 20px
-                width: calc(100% - 80px)
+                - margin-vertical
+                - padding-vertical
             slots:
               default:
                 - component: f7-icon
                   config:
-                    class: margin-horizontal margin
+                    color: '=(items[props.activeDeviceShuffle].state === "ON") ? "green" : ""'
+                    f7: '=(props.activeDeviceShuffle) ? "shuffle" : ""'
+                    size: '=props.iconSize ? props.iconSize : "20"'
+                  slots:
+                    default:
+                      - component: oh-button
+                        config:
+                          action: command
+                          actionCommand: '=(items[props.activeDeviceShuffle].state !== "ON") ? "ON" : "OFF"'
+                          actionItem: = props.activeDeviceShuffle
+                          style:
+                            position: absolute
+                            height: 100%
+                            top: 0px
+                - component: oh-player-controls
+                  config:
+                    item: =props.trackPlayer
+                    style:
+                      width: 50%
+                - component: f7-icon
+                  config:
+                    color: '=(items[props.repeatMode].state === "context") ? "green" : (items[props.repeatMode].state === "track") ? "green" : ""'
+                    f7: '=(props.repeatMode) ? (items[props.repeatMode].state === "context") ? "repeat" : (items[props.repeatMode].state === "track") ? "repeat_1" : "repeat" : ""'
+                    size: '=props.iconSize ? props.iconSize : "20"'
+                  slots:
+                    default:
+                      - component: oh-button
+                        config:
+                          action: command
+                          actionCommand: '=(items[props.repeatMode].state === "context") ? "track" : (items[props.repeatMode].state === "track") ? "off": "context"'
+                          actionItem: = props.repeatMode
+                          style:
+                            position: absolute
+                            height: 100%
+                            top: 0px
+          - component: f7-row
+            config:
+              class:
+                - align-items-center
+                - justify-content-center
+                - margin-vertical
+            slots:
+              default:
+                - component: f7-icon
+                  config:
                     f7: speaker_3
-                    size: 25
+                    size: '=props.iconSize ? props.iconSize : "20"'
+                    style:
+                      position: absolute
+                      left: 5%
                 - component: oh-slider
                   config:
-                    color: green
                     item: =props.activeDeviceVolume
+                    color: =props.color
                     label: true
                     style:
                       min: 0
-                      width: calc(100% - 30px)
-    - component: f7-row
-      config:
-        class:
-          - justify-content-space-around
-          - align-items-center
-          - align-content-stretch
-      slots:
-        default:
-          - component: f7-col
+                      max: 100
+                      width: 80%
+          - component: f7-row
             config:
-              class: resizable
-              noShadow: true
-              style:
-                fontSize: 20px
-                overflow: hidden
+              class:
+                - justify-content-space-around
+                - align-items-center
             slots:
               default:
-                - component: oh-label-card
-                  config:
-                    action: options
-                    actionItem: =props.activeDevices
-                    background: "#333"
-                    fontSize: small
-                    icon: f7:hifispeaker
-                    iconSize: 20
-                    item: =props.activeDevices
-                    style:
-                      height: 100%
-                      top: -10px
-          - component: f7-col
-            config:
-              class: resizable
-              medium: 50
-              noShadow: true
-              style:
-                fontSize: 20px
-                overflow: hidden
-            slots:
-              default:
-                - component: oh-label-card
-                  config:
-                    action: options
-                    actionItem: =props.playlists
-                    background: "#333"
-                    fontSize: small
-                    icon: f7:music_note_list
-                    iconSize: 20
-                    item: =props.playlists
-                    style:
-                      height: 100%
+                - component: f7-col
+                  slots:
+                    default:
+                      - component: oh-label-card
+                        config:
+                          item: =props.activeDevices
+                          action: options
+                          actionItem: =props.activeDevices
+                          fontSize: '=props.fontSize ? props.fontSize : "12px"'
+                          icon: f7:hifispeaker
+                          iconSize: '=props.iconSize ? props.iconSize : "20"'
+                          background: "#333"
+                - component: f7-col
+                  slots:
+                    default:
+                      - component: oh-label-card
+                        config:
+                          item: =props.playlists
+                          action: options
+                          actionItem: =props.playlists
+                          fontSize: '=props.fontSize ? props.fontSize : "12px"'
+                          icon: f7:music_note_list
+                          iconSize: '=props.iconSize ? props.iconSize : "20"'
+                          background: "#333"
